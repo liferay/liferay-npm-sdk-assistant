@@ -1,0 +1,45 @@
+{
+	"name": "liferay-npm-sdk",
+	"version": "1.0.0",
+	"description": "Liferay npm SDK",
+	"main": "index.js",
+	"scripts": {
+		"build": "babel --source-maps -D -d lib src",
+		"prepublish": "npm run build",
+		"ci": "prettier-eslint --list-different && npm run lint && npm run test",
+		"format": "prettier-eslint --write src/*.js src/**/*.js",
+		"lint": "eslint src/*.js src/**/*.js",
+		"precommit": "lint-staged",
+		"test": "jest"
+	},
+	"license": "LGPL-3.0",
+	"bin": {
+		"lnk": "bin/lnk.js"
+	},
+	"devDependencies": {
+		"babel-cli": "^6.24.1",
+		"babel-preset-es2015": "^6.24.1",
+		"eslint": "^4.1.1",
+		"eslint-config-liferay": "^1.0.2",
+		"husky": "^0.14.2",
+		"jest": "^20.0.4",
+		"lerna": "^2.0.0-rc.5",
+		"lint-staged": "^4.0.0",
+		"prettier-eslint-cli": "^4.3.2"
+	},
+	"lint-staged": {
+		"*.js": [
+			"prettier-eslint --write src/*.js src/**/*.js",
+			"git add"
+		]
+	},
+	"jest": {
+		"modulePathIgnorePatterns": [
+			"lib/.*"
+		]
+	},
+	"dependencies": {
+		"gogo-shell": "0.0.5",
+		"yargs": "^10.0.3"
+	}
+}
