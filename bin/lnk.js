@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 let yargs = require('yargs');
-let cmd = require('../lib/index');
+let cmd = require('../lib/index').default;
 
 yargs
 	.command({
-		command: 'analyze',
-		desc: 'Analyze project and show conclusions',
-		handler: cmd.analyze,
+		command: 'features',
+		desc: 'Analyze project and show feature level',
+		handler: cmd.features,
 		builder: {
 			server: {
 				describe: 'Server address',
