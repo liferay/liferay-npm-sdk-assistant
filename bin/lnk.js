@@ -22,6 +22,22 @@ yargs
 			},
 		},
 	})
-	.demandCommand(1, 'Doing nothing: no command specified')
+	.command({
+		command: 'man',
+		desc: 'Show information or documentation about the SDK',
+		handler: cmd.man,
+		builder: yargs =>
+			yargs
+				.command({
+					command: 'features',
+					desc: 'List feature levels and minimum component versions',
+					handler: cmd.man,
+				})
+				.demandCommand(
+					1,
+					'Doing nothing: no item to describe provided\n'
+				),
+	})
+	.demandCommand(1, 'Doing nothing: no command specified\n')
 	.help()
 	.wrap(80).argv;

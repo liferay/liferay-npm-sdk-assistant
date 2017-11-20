@@ -1,5 +1,7 @@
-import * as features from './cmd/features';
+import features from './cmd/features';
+import man from './cmd/man';
 
 export default {
-	features: features.features,
+  features: features,
+  man: man,
 };
