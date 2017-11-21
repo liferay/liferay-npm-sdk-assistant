@@ -1,7 +1,7 @@
 {
-	"name": "liferay-npm-sdk",
+	"name": "liferay-npm-sdk-assistant",
 	"version": "1.0.0",
-	"description": "Liferay npm SDK",
+	"description": "Liferay npm SDK Assistant",
 	"main": "index.js",
 	"scripts": {
 		"build": "babel --source-maps -D -d lib src",
@@ -14,7 +14,7 @@
 	},
 	"license": "LGPL-3.0",
 	"bin": {
-		"lnk": "bin/lnk.js"
+		"lnka": "bin/lnka.js"
 	},
 	"devDependencies": {
 		"babel-cli": "^6.24.1",
