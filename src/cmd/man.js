@@ -59,7 +59,13 @@ function features() {
     console.log('  · AMD loader:', formatVersion(versions.loader));
     console.log('  · Supported features:');
     for (let feature of Object.keys(supportedFeatures[level])) {
-      console.log('      -', feature, `(${supportedFeatures[level][feature]})`);
+      let issue = '';
+
+      if (supportedFeatures[level][feature]) {
+        issue = `(${supportedFeatures[level][feature]})`;
+      }
+
+      console.log('      -', feature, issue);
     }
     console.log('');
   }
