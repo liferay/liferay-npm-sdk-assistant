@@ -45,7 +45,7 @@ and
 [templates](https://github.com/liferay/liferay-portal/tree/master/modules/sdk/project-templates) 
 that rely on a certain feature level.
 
-## Feature level concept
+## Feature level concept
 
 Given that different components of the SDK may have different release cycles, we 
 have coined the term *feature level* to refer to specific cuts in time where 
