@@ -4,71 +4,81 @@ import {spawnSync} from 'child_process';
 import {parseVersion} from '../misc/util.js';
 
 /**
+ * @param {boolean} debug
  * @return {Promise}
  */
-export function version() {
+export function version({debug = false} = {}) {
   return new Promise((resolve, reject) => {
-    const out = runInGradle('lnk_get_version', `println gradle.gradleVersion`);
+    try {
+      const out = runInGradle(
+        'lnk_get_version',
+        `println gradle.gradleVersion`,
+        debug
+      );
+      resolve(parseVersion(out));
+    } catch (err) {
+      if (debug) {
+        console.error('Could not get gradle version', err);
+      }
 
-    if (!out) {
-      return resolve(undefined);
+      return undefined;
     }
-
-    resolve(parseVersion(out));
   });
 }
 
 /**
+ * @param {boolean} debug
  * @return {Promise}
  */
-export function nodePluginVersion() {
+export function nodePluginVersion({debug = false} = {}) {
   return new Promise((resolve, reject) => {
-    const out = runInGradle(
-      'lnk_get_node_plugin_version',
-      `buildscript.configurations.classpath.each { println it.name}`
-    );
+    try {
+      const out = runInGradle(
+        'lnk_get_node_plugin_version',
+        `buildscript.configurations.classpath.each { println it.name}`
+      );
 
-    if (!out) {
-      return resolve(undefined);
+      const lines = out.split('\n');
+
+      const pluginLines = lines.filter(line =>
+        line.startsWith('com.liferay.gradle.plugins.node-')
+      );
+
+      if (pluginLines.length != 1) {
+        throw new Error('Could not find node plugin in output: ' + out);
+      }
+
+      const parts = pluginLines[0].split('-');
+
+      if (parts.length != 2) {
+        throw new Error(
+          'Could not find node plugin version in: ' + pluginLines[0]
+        );
+      }
+
+      const version = parts[1].replace('.jar', '');
+
+      resolve(parseVersion(version));
+    } catch (err) {
+      if (debug) {
+        console.error('Could not get gradle node plugin version', err);
+      }
+
+      return undefined;
     }
-
-    const lines = out.split('\n');
-
-    const pluginLines = lines.filter(line =>
-      line.startsWith('com.liferay.gradle.plugins.node-')
-    );
-
-    if (pluginLines.length != 1) {
-      return resolve(undefined);
-    }
-
-    const parts = pluginLines[0].split('-');
-
-    if (parts.length != 2) {
-      return resolve(undefined);
-    }
-
-    const version = parts[1].replace('.jar', '');
-
-    resolve(parseVersion(version));
   });
 }
 
 /**
  * @param {String} task
  * @param {String} taskScript
+ * @param {boolean} debug
  * @return {String}
  */
-function runInGradle(task, taskScript = '') {
-  let buildGradleContent;
-
+function runInGradle(task, taskScript = '', debug = false) {
   try {
-    buildGradleContent = fs.readFileSync('build.gradle');
-  } catch (err) {
-    return undefined;
-  }
+    const buildGradleContent = fs.readFileSync('build.gradle');
 
-  try {
     fs.writeFileSync(
       '.build.gradle.liferay.npm.sdk',
       `
@@ -88,20 +98,22 @@ task ${task} << {
     ]);
 
     if (proc.error) {
-      return undefined;
+      throw proc.error;
     }
 
     const out = proc.output.toString();
     const parts = out.split(`{${task}}`);
 
     if (parts.length != 3) {
-      return undefined;
+      throw new Error('Could not parse gradle output: ' + out);
     }
 
     return parts[1];
-  } catch (err) {
-    return undefined;
   } finally {
-    fs.unlinkSync('.build.gradle.liferay.npm.sdk');
+    try {
+      fs.unlinkSync('.build.gradle.liferay.npm.sdk');
+    } catch (err) {
+      // Ignore
+    }
   }
 }

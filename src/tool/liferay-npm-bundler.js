@@ -3,38 +3,51 @@ import {spawnSync} from 'child_process';
 import {parseVersion} from '../misc/util.js';
 
 /**
+ * @param {boolean} debug
  * @return {Promise}
  */
-export function version() {
+export function version({debug = false} = {}) {
   return new Promise((resolve, reject) => {
     // TODO: get version directly from liferay-npm-bundler
     // (see https://github.com/liferay/liferay-npm-build-tools/issues/64)
-    const proc = spawnSync('npm', ['list']);
+    try {
+      const proc = spawnSync('npm', ['list']);
 
-    if (proc.error) {
-      return resolve(undefined);
+      if (proc.error) {
+        throw proc.error;
+      }
+
+      const out = proc.output.toString();
+
+      if (!out) {
+        throw new Error('No output returned from npm');
+      }
+
+      const lines = out.split('\n');
+
+      const versionLines = lines.filter(
+        line => line.indexOf('liferay-npm-bundler@') != -1
+      );
+
+      if (versionLines.length != 1) {
+        throw new Error(
+          'More than one liferay-npm-bundler line present in ' +
+            'output: ' +
+            out
+        );
+      }
+
+      const versionLine = versionLines[0];
+
+      const version = versionLine.replace(/[^0-9.]/g, '');
+
+      resolve(parseVersion(version));
+    } catch (err) {
+      if (debug) {
+        console.error('Could not get liferay-npm-bundler version', err);
+      }
+
+      return undefined;
     }
-
-    const out = proc.output.toString();
-
-    if (!out) {
-      return resolve(undefined);
-    }
-
-    const lines = out.split('\n');
-
-    const versionLines = lines.filter(
-      line => line.indexOf('liferay-npm-bundler@') != -1
-    );
-
-    if (versionLines.length != 1) {
-      return resolve(undefined);
-    }
-
-    const versionLine = versionLines[0];
-
-    const version = versionLine.replace(/[^0-9.]/g, '');
-
-    resolve(parseVersion(version));
   });
 }

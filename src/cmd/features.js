@@ -21,7 +21,6 @@ import * as portal from '../tool/portal';
  * @return {void}
  */
 export default function(argv) {
-  // TODO: report diagnostic errors when requested by a flag
   // TODO: find all babel and liferay-npm-bundler plugin versions just in case
 
   console.log('');
@@ -30,39 +29,42 @@ export default function(argv) {
 
   let gradleVersion;
   const gradlePromise = gradle
-    .version()
+    .version(argv)
     .then(version => (gradleVersion = version));
 
   let pluginVersion;
   const pluginPromise = gradle
-    .nodePluginVersion()
+    .nodePluginVersion(argv)
     .then(version => (pluginVersion = version));
 
   let npmVersion;
-  const npmPromise = npm.version().then(version => (npmVersion = version));
+  const npmPromise = npm.version(argv).then(version => (npmVersion = version));
 
   let babelVersion;
   const babelPromise = babel
-    .version()
+    .version(argv)
     .then(version => (babelVersion = version));
 
   let bundlerVersion;
   const bundlerPromise = liferayNpmBundler
-    .version()
+    .version(argv)
     .then(version => (bundlerVersion = version));
 
   let extenderVersion;
   const extenderPromise = portal
     .osgiBundleVersion(
-      argv.server,
-      argv.gogoPort,
-      'Liferay Frontend JS Loader Modules Extender'
+      Object.assign(
+        {
+          bundleName: 'Liferay Frontend JS Loader Modules Extender',
+        },
+        argv
+      )
     )
     .then(version => (extenderVersion = version));
 
   let loaderVersion;
   const loaderPromise = portal
-    .amdLoaderVersion(argv.server, argv.httpPort)
+    .amdLoaderVersion(argv)
     .then(version => (loaderVersion = version));
 
   Promise.all([

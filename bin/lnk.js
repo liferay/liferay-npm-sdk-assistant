@@ -22,6 +22,10 @@ yargs
 			},
 		},
 	})
+	.option('debug', {
+		describe: 'Show debug information about what is being done',
+		default: false,
+	})
 	.command({
 		command: 'man',
 		desc: 'Show information or documentation about the SDK',

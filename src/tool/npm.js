@@ -3,24 +3,33 @@ import {spawnSync} from 'child_process';
 import {parseVersion} from '../misc/util.js';
 
 /**
+ * @param {boolean} debug
  * @return {Promise}
  */
-export function version() {
+export function version({debug = false} = {}) {
   return new Promise((resolve, reject) => {
-    const proc = spawnSync('npm', ['-v']);
+    try {
+      const proc = spawnSync('npm', ['-v']);
 
-    if (proc.error) {
-      return resolve(undefined);
+      if (proc.error) {
+        throw proc.error;
+      }
+
+      const out = proc.output.toString();
+
+      if (!out) {
+        throw new Error('No output returned from npm');
+      }
+
+      const version = out.replace(/[^0-9.]/g, '');
+
+      resolve(parseVersion(version));
+    } catch (err) {
+      if (debug) {
+        console.error('Could not get npm version', err);
+      }
+
+      return undefined;
     }
-
-    const out = proc.output.toString();
-
-    if (!out) {
-      return resolve(undefined);
-    }
-
-    const version = out.replace(/[^0-9.]/g, '');
-
-    resolve(parseVersion(version));
   });
 }
