@@ -15,7 +15,7 @@ If you want to learn the theoric foundations of this tool keep reading.
 Otherwise, jump directly to the [Usage](#usage) section to learn the syntax of 
 the tool.
 
-## Defition of npm SDK
+## Definition of npm SDK
 
 Currently, *npm SDK* is an abstract umbrella term to refer to the coordinated 
 functionalities of all these Liferay components:
