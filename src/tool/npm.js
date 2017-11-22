@@ -29,7 +29,7 @@ export function version({debug = false} = {}) {
         console.error('Could not get npm version', err);
       }
 
-      return undefined;
+      resolve(undefined);
     }
   });
 }

@@ -23,7 +23,7 @@ export function version({debug = false} = {}) {
         console.error('Could not get gradle version', err);
       }
 
-      return undefined;
+      resolve(undefined);
     }
   });
 }
@@ -67,7 +67,7 @@ export function nodePluginVersion({debug = false} = {}) {
         console.error('Could not get gradle node plugin version', err);
       }
 
-      return undefined;
+      resolve(undefined);
     }
   });
 }

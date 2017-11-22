@@ -29,7 +29,7 @@ export function version({debug = false} = {}) {
         console.error('Could not get babel version', err);
       }
 
-      return resolve(undefined);
+      resolve(undefined);
     }
   });
 }

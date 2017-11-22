@@ -47,7 +47,7 @@ export function version({debug = false} = {}) {
         console.error('Could not get liferay-npm-bundler version', err);
       }
 
-      return undefined;
+      resolve(undefined);
     }
   });
 }
