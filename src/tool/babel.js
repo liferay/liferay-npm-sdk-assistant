@@ -1,4 +1,5 @@
 import {spawnSync} from 'child_process';
+import path from 'path';
 
 import {parseVersion} from '../misc/util.js';
 
@@ -48,9 +49,11 @@ export function version({debug = false} = {}) {
 function runBabel(debug, ...args) {
   const isWin = /^win/.test(process.platform);
 
-  const executable = isWin
+  let executable = isWin
     ? './node_modules/.bin/babel.cmd'
     : './node_modules/.bin/babel';
+
+  executable = path.normalize(executable);
 
   if (debug) {
     console.log('Running', executable, ...args);

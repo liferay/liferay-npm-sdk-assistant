@@ -173,6 +173,8 @@ function runGradle(debug, ...args) {
     dir = path.dirname(dir);
   }
 
+  executable = path.normalize(executable);
+
   if (debug) {
     console.log('Running', executable, ...args);
   }
