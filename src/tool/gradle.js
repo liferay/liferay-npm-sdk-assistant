@@ -1,5 +1,5 @@
 import {spawnSync} from 'child_process';
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
 
 import {parseVersion} from '../misc/util.js';
@@ -80,12 +80,19 @@ export function nodePluginVersion({debug = false} = {}) {
  */
 function runInGradle(debug, task, taskScript = '') {
   try {
+    fs.copySync('build.gradle', 'build.gradle.lnka');
+  } catch (err) {
+    throw err;
+  }
+
+  try {
     const buildGradleContent = fs.readFileSync('build.gradle');
 
     fs.writeFileSync(
-      '.build.gradle.liferay.npm.sdk',
+      'build.gradle',
       `
 ${buildGradleContent}
+
 task ${task} << {
 	println "{${task}}"
 	${taskScript}
@@ -94,7 +101,7 @@ task ${task} << {
 			`
     );
 
-    const proc = runGradle(debug, '-b', '.build.gradle.liferay.npm.sdk', task);
+    const proc = runGradle(debug, task);
 
     if (proc.error) {
       throw proc.error;
@@ -110,9 +117,22 @@ task ${task} << {
     return parts[1];
   } finally {
     try {
-      fs.unlinkSync('.build.gradle.liferay.npm.sdk');
+      fs.copySync('build.gradle.lnka', 'build.gradle');
+      fs.unlinkSync('build.gradle.lnka');
     } catch (err) {
-      // Ignore
+      console.log(
+        'ERROR: lnka modified your build.gradle but was unable to',
+        'restore it to its original form. There is still a copy of',
+        'the original build.gradle file in build.gradle.lnka. Please',
+        'restore it manually and file an issue in lnka project.',
+        'Sorry for the inconveniences :-('
+      );
+      console.log(
+        'Here is the error that prevented the restore, for debugging',
+        'purposes:',
+        err
+      );
+      process.exit(1);
     }
   }
 }
@@ -127,7 +147,7 @@ function runGradle(debug, ...args) {
 
   const cmdName = isWin ? 'gradlew.bat' : 'gradlew';
 
-  let executable = 'gradle';
+  let executable = cmdName;
 
   let dir = path.resolve('.');
 
