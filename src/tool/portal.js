@@ -65,7 +65,13 @@ export function osgiBundleVersion(
 
           const version = match[1].replace(/[^0-9.]/g, '');
 
-          resolve(parseVersion(version));
+          const parsedVersion = parseVersion(version);
+
+          if (parsedVersion === undefined) {
+            throw new Error('Could not parse: ' + version);
+          }
+
+          resolve(parsedVersion);
         } catch (err) {
           handleError(err);
         }
@@ -132,11 +138,19 @@ export function amdLoaderVersion(
 
               const match = versionLine.match(/.*'([0-9.]*)'.*/);
 
-              if (!match[1]) {
+              const version = match[1];
+
+              if (version) {
                 'Loader version not found version line: ' + versionLine;
               }
 
-              resolve(parseVersion(match[1]));
+              const parsedVersion = parseVersion(version);
+
+              if (parsedVersion === undefined) {
+                throw new Error('Could not parse: ' + version);
+              }
+
+              resolve(parsedVersion);
             });
           } catch (err) {
             handleError(err);

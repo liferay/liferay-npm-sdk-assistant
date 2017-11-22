@@ -17,7 +17,14 @@ export function version({debug = false} = {}) {
         `println gradle.gradleVersion`,
         debug
       );
-      resolve(parseVersion(out));
+
+      const parsedVersion = parseVersion(out);
+
+      if (parsedVersion === undefined) {
+        throw new Error('Could not parse: ' + version);
+      }
+
+      resolve(parsedVersion);
     } catch (err) {
       if (debug) {
         console.error('Could not get gradle version', err);
@@ -61,7 +68,13 @@ export function nodePluginVersion({debug = false} = {}) {
 
       const version = parts[1].replace('.jar', '');
 
-      resolve(parseVersion(version));
+      const parsedVersion = parseVersion(version);
+
+      if (parsedVersion === undefined) {
+        throw new Error('Could not parse: ' + version);
+      }
+
+      resolve(parsedVersion);
     } catch (err) {
       if (debug) {
         console.error('Could not get gradle node plugin version', err);

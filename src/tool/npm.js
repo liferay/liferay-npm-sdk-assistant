@@ -23,7 +23,13 @@ export function version({debug = false} = {}) {
 
       const version = out.replace(/[^0-9.]/g, '');
 
-      resolve(parseVersion(version));
+      const parsedVersion = parseVersion(version);
+
+      if (parsedVersion === undefined) {
+        throw new Error('Could not parse: ' + version);
+      }
+
+      resolve(parsedVersion);
     } catch (err) {
       if (debug) {
         console.error('Could not get npm version', err);
