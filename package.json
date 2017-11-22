@@ -37,7 +37,8 @@
 	},
 	"dependencies": {
 		"gogo-shell": "0.0.5",
-		"update-notifier": "^2.3.0",
+		"latest-version": "^3.1.0",
+		"semver": "^5.4.1",
 		"yargs": "^10.0.3"
 	}
 }
