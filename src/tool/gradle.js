@@ -1,5 +1,6 @@
-import fs from 'fs';
 import {spawnSync} from 'child_process';
+import fs from 'fs';
+import path from 'path';
 
 import {parseVersion} from '../misc/util.js';
 
@@ -11,6 +12,7 @@ export function version({debug = false} = {}) {
   return new Promise((resolve, reject) => {
     try {
       const out = runInGradle(
+        debug,
         'lnk_get_version',
         `println gradle.gradleVersion`,
         debug
@@ -34,6 +36,7 @@ export function nodePluginVersion({debug = false} = {}) {
   return new Promise((resolve, reject) => {
     try {
       const out = runInGradle(
+        debug,
         'lnk_get_node_plugin_version',
         `buildscript.configurations.classpath.each { println it.name}`
       );
@@ -70,12 +73,12 @@ export function nodePluginVersion({debug = false} = {}) {
 }
 
 /**
+ * @param {boolean} debug
  * @param {String} task
  * @param {String} taskScript
- * @param {boolean} debug
  * @return {String}
  */
-function runInGradle(task, taskScript = '', debug = false) {
+function runInGradle(debug, task, taskScript = '') {
   try {
     const buildGradleContent = fs.readFileSync('build.gradle');
 
@@ -91,11 +94,7 @@ task ${task} << {
 			`
     );
 
-    const proc = spawnSync('gradle', [
-      '-b',
-      '.build.gradle.liferay.npm.sdk',
-      task,
-    ]);
+    const proc = runGradle(debug, '-b', '.build.gradle.liferay.npm.sdk', task);
 
     if (proc.error) {
       throw proc.error;
@@ -116,4 +115,36 @@ task ${task} << {
       // Ignore
     }
   }
+}
+
+/**
+ * @param {boolean} debug
+ * @param {Array} args
+ * @return {Object} a Node.js process descriptor
+ */
+function runGradle(debug, ...args) {
+  const isWin = /^win/.test(process.platform);
+
+  const cmdName = isWin ? 'gradlew.bat' : 'gradlew';
+
+  let executable = 'gradle';
+
+  let dir = path.resolve('.');
+
+  while (dir != '/') {
+    if (fs.existsSync(`${dir}/${cmdName}`)) {
+      executable = `${dir}/${cmdName}`;
+      break;
+    }
+
+    dir = path.dirname(dir);
+  }
+
+  if (debug) {
+    console.log('Running', executable, ...args);
+  }
+
+  return spawnSync('gradle', args, {
+    shell: true,
+  });
 }

@@ -11,7 +11,7 @@ export function version({debug = false} = {}) {
     // TODO: get version directly from liferay-npm-bundler
     // (see https://github.com/liferay/liferay-npm-build-tools/issues/64)
     try {
-      const proc = spawnSync('npm', ['list']);
+      const proc = runNpm(debug, 'list');
 
       if (proc.error) {
         throw proc.error;
@@ -50,4 +50,19 @@ export function version({debug = false} = {}) {
       return undefined;
     }
   });
+}
+
+/**
+ * @param {boolean} debug
+ * @param {Array} args
+ * @return {Object} a Node.js process descriptor
+ */
+function runNpm(debug, ...args) {
+  const executable = 'npm';
+
+  if (debug) {
+    console.log('Running', executable, ...args);
+  }
+
+  return spawnSync(executable, args, {shell: true});
 }

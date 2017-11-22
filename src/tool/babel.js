@@ -9,7 +9,7 @@ import {parseVersion} from '../misc/util.js';
 export function version({debug = false} = {}) {
   return new Promise((resolve, reject) => {
     try {
-      const proc = spawnSync('./node_modules/.bin/babel', ['--version']);
+      const proc = runBabel(debug, '--version');
 
       if (proc.error) {
         throw proc.error;
@@ -32,4 +32,23 @@ export function version({debug = false} = {}) {
       return resolve(undefined);
     }
   });
+}
+
+/**
+ * @param {boolean} debug
+ * @param {Array} args
+ * @return {Object} a Node.js process descriptor
+ */
+function runBabel(debug, ...args) {
+  const isWin = /^win/.test(process.platform);
+
+  const executable = isWin
+    ? './node_modules/.bin/babel.cmd'
+    : './node_modules/.bin/babel';
+
+  if (debug) {
+    console.log('Running', executable, ...args);
+  }
+
+  return spawnSync(executable, args, {shell: true});
 }

@@ -26,6 +26,16 @@ export function osgiBundleVersion(
 
     gogoShell.on('error', handleError);
 
+    if (debug) {
+      console.log(
+        'Querying GoGo console at',
+        `${server}:${gogoPort}`,
+        'for',
+        `"${bundleName}"`,
+        'version'
+      );
+    }
+
     return gogoShell
       .connect({
         host: server,
@@ -82,6 +92,14 @@ export function amdLoaderVersion(
 
       resolve(undefined);
     };
+
+    if (debug) {
+      console.log(
+        'Querying Liferay Portal at',
+        `${server}:${httpPort}`,
+        'for AMD Loader version'
+      );
+    }
 
     http
       .get(
