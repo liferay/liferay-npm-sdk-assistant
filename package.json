@@ -6,7 +6,8 @@
 	"scripts": {
 		"build": "babel --source-maps -D -d lib src",
 		"prepublish": "npm run build",
-		"ci": "prettier-eslint --list-different && npm run lint && npm run test",
+		"ci":
+			"prettier-eslint --list-different && npm run lint && npm run test",
 		"format": "prettier-eslint --write src/*.js src/**/*.js",
 		"lint": "eslint src/*.js src/**/*.js",
 		"precommit": "lint-staged",
@@ -27,16 +28,12 @@
 		"lint-staged": "^4.0.0",
 		"prettier-eslint-cli": "^4.3.2"
 	},
+	"files": ["CODEOWNERS", "bin", "lib", "src"],
 	"lint-staged": {
-		"*.js": [
-			"prettier-eslint --write src/*.js src/**/*.js",
-			"git add"
-		]
+		"*.js": ["prettier-eslint --write src/*.js src/**/*.js", "git add"]
 	},
 	"jest": {
-		"modulePathIgnorePatterns": [
-			"lib/.*"
-		]
+		"modulePathIgnorePatterns": ["lib/.*"]
 	},
 	"dependencies": {
 		"gogo-shell": "0.0.5",
