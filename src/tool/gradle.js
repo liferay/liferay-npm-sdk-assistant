@@ -14,8 +14,7 @@ export function version({debug = false} = {}) {
       const out = runInGradle(
         debug,
         'lnk_get_version',
-        `println gradle.gradleVersion`,
-        debug
+        `println gradle.gradleVersion`
       );
 
       const parsedVersion = parseVersion(out);
@@ -179,7 +178,7 @@ function runGradle(debug, ...args) {
     console.log('Running', executable, ...args);
   }
 
-  return spawnSync('gradle', args, {
+  return spawnSync(executable, args, {
     shell: true,
   });
 }
