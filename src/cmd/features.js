@@ -7,6 +7,7 @@ import {
   bundlerBreakpoints,
   extenderBreakpoints,
   loaderBreakpoints,
+  bundlerPluginBreakpoints,
 } from '../misc/definitions';
 import {lessThan, formatVersion} from '../misc/util';
 import * as gradle from '../tool/gradle';
@@ -67,6 +68,11 @@ export default function(argv) {
     .amdLoaderVersion(argv)
     .then(version => (loaderVersion = version));
 
+  let bundlerPluginsVersions;
+  const bundlerPluginsPromise = liferayNpmBundler
+    .pluginVersions(argv)
+    .then(versions => (bundlerPluginsVersions = versions || {}));
+
   Promise.all([
     gradlePromise,
     pluginPromise,
@@ -75,6 +81,7 @@ export default function(argv) {
     bundlerPromise,
     extenderPromise,
     loaderPromise,
+    bundlerPluginsPromise,
   ])
     .then(() => {
       console.log('You are using the following versions of components:');
@@ -88,6 +95,35 @@ export default function(argv) {
         formatVersion(extenderVersion)
       );
       console.log('  · AMD loader:', formatVersion(loaderVersion));
+      console.log('');
+
+      if (Object.keys(bundlerPluginsVersions).length == 0) {
+        console.log(
+          'No bundler or Babel plugin versions were detected. This\n',
+          'is usually due to using an old version of\n',
+          'liferay-npm-bundler. Please upgrade liferay-npm-bundler\n',
+          'to version ≥1.2.3 to get plugin version information.'
+        );
+      } else {
+        console.log('And the following bundler and Babel plugin versions:');
+        for (let key in bundlerPluginsVersions) {
+          if (bundlerPluginsVersions.hasOwnProperty(key)) {
+            console.log(
+              `  · ${key}:`,
+              formatVersion(bundlerPluginsVersions[key])
+            );
+          }
+        }
+        console.log('');
+        console.log(
+          'Please note that Babel plugin versions cannot be retrieved\n',
+          'when the plugins are contributed using a preset. That means\n',
+          'that your feature level might be lower than the one\n',
+          'reported if the feature you want to use is provided by a\n',
+          'Babel plugin and you are using a lower version than the one\n',
+          'required by the feature.'
+        );
+      }
       console.log('');
 
       let featureLevel = maxFeatureLevel;
@@ -130,12 +166,28 @@ export default function(argv) {
 
       if (featureLevel == 0) {
         console.log(
-          'You are currently using a component that does not satisfy',
-          'the minimum version requirement. Please update it to be able',
-          'to use the npm SDK correctly.'
+          'You are currently using a component that does not\n',
+          'satisfy the minimum version requirement. Please update\n',
+          'it to be able to use the npm SDK correctly.'
         );
 
         return;
+      }
+
+      for (let bundlerPlugin in bundlerPluginsVersions) {
+        if (bundlerPluginsVersions.hasOwnProperty(bundlerPlugin)) {
+          const breakpoints = bundlerPluginBreakpoints[bundlerPlugin];
+
+          if (breakpoints) {
+            const version = bundlerPluginsVersions[bundlerPlugin];
+
+            featureLevel = tryLevelDecrement(
+              featureLevel,
+              version,
+              breakpoints
+            );
+          }
+        }
       }
 
       let anyUndefined = !(
@@ -145,13 +197,15 @@ export default function(argv) {
         babelVersion &&
         bundlerVersion &&
         extenderVersion &&
-        loaderVersion
+        loaderVersion &&
+        bundlerPluginsVersions &&
+        Object.keys(bundlerPluginsVersions).length > 0
       );
 
       if (anyUndefined) {
         console.log(
-          'There was at least one version number that could not be',
-          'retrieved. That means that you feature level might be',
+          'There was at least one version number that could not be\n',
+          'retrieved. That means that your feature level might be\n',
           'lower than the one reported.'
         );
         console.log('');
