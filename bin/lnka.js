@@ -49,6 +49,10 @@ latestVersion(pkg.name)
  */
 function main() {
   yargs
+    .option('debug', {
+      describe: 'Show debug information about what is being done',
+      default: false,
+    })
     .command({
       command: 'features',
       desc: 'Analyze project and show feature level',
@@ -68,10 +72,6 @@ function main() {
         },
       },
     })
-    .option('debug', {
-      describe: 'Show debug information about what is being done',
-      default: false,
-    })
     .command({
       command: 'man',
       desc: 'Show information or documentation about the SDK',
@@ -83,9 +83,10 @@ function main() {
             desc: 'List feature levels and minimum component versions',
             handler: cmd.man,
           })
-          .demandCommand(1, 'Doing nothing: no item to describe provided\n'),
+          .demandCommand(1, ''),
     })
-    .demandCommand(1, 'Doing nothing: no command specified\n')
+    .demandCommand(1, '')
+    .strict()
     .help()
     .wrap(80).argv;
 }
