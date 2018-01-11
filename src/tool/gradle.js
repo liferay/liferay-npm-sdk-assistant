@@ -44,20 +44,26 @@ export function nodePluginVersion({debug = false} = {}) {
       const out = runInGradle(
         debug,
         'lnk_get_node_plugin_version',
-        `buildscript.configurations.classpath.each { println it.name}`
+        `
+                plugins.each {
+                    println it.class.getResource(
+                        it.class.simpleName + ".class"
+                    ).path
+                }
+                `
       );
 
       const lines = out.split('\n');
 
-      const pluginLines = lines.filter(line =>
-        line.startsWith('com.liferay.gradle.plugins.node-')
+      const pluginLines = lines.filter(
+        line => line.indexOf('com.liferay.gradle.plugins.node-') != -1
       );
 
       if (pluginLines.length != 1) {
         throw new Error('Could not find node plugin in output: ' + out);
       }
 
-      const parts = pluginLines[0].split('-');
+      let parts = pluginLines[0].split('com.liferay.gradle.plugins.node-');
 
       if (parts.length != 2) {
         throw new Error(
@@ -65,7 +71,15 @@ export function nodePluginVersion({debug = false} = {}) {
         );
       }
 
-      const version = parts[1].replace('.jar', '');
+      parts = parts[1].split('.jar');
+
+      if (parts.length != 2) {
+        throw new Error(
+          'Could not find node plugin version in: ' + pluginLines[0]
+        );
+      }
+
+      const version = parts[0];
 
       const parsedVersion = parseVersion(version);
 
@@ -119,7 +133,7 @@ task ${task} << {
       throw proc.error;
     }
 
-    const out = proc.output.toString();
+    const out = proc.stdout.toString();
     const parts = out.split(`{${task}}`);
 
     if (parts.length != 3) {
