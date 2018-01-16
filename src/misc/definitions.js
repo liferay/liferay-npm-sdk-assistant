@@ -17,6 +17,8 @@ export const maxFeatureLevel = 3;
 /** Feature level contracts */
 export const supportedFeatures = {
   3: {
+    'Support for jQuery when Liferay AMD Loader is not exposed as a global':
+      'https://github.com/liferay/liferay-npm-build-tools/issues/68',
     'Support for @angular/animations package':
       'https://github.com/liferay/liferay-npm-build-tools/issues/66',
     'Support for packages with inner package.json files':
@@ -59,6 +61,10 @@ export const loaderBreakpoints = [
 export const bundlerPluginBreakpoints = {
   'liferay-npm-bundler-plugin-inject-angular-dependencies': [
     {version: [1, 3, 0], level: maxFeatureLevel},
+    {version: [1, 0, 0], level: 2},
+  ],
+  'babel-plugin-namespace-amd-define': [
+    {version: [1, 4, 0], level: maxFeatureLevel},
     {version: [1, 0, 0], level: 2},
   ],
 };
