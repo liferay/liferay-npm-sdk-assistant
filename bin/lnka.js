@@ -85,6 +85,27 @@ function main() {
           })
           .demandCommand(1, ''),
     })
+    .command({
+      command: 'resolve',
+      desc:
+        'Show information about module resolution based on a running ' +
+        'portal instance',
+      handler: cmd.resolve,
+      builder: {
+        server: {
+          describe: 'Server address',
+          default: 'localhost',
+        },
+        httpPort: {
+          describe: 'HTTP port',
+          default: '8080',
+        },
+        packages: {
+          describe: 'Show only packages instead of modules',
+          default: false,
+        },
+      },
+    })
     .demandCommand(1, '')
     .strict()
     .help()
