@@ -15,27 +15,31 @@
 export const maxFeatureLevel = 3;
 
 /** Feature level contracts */
+/* eslint-disable */
 export const supportedFeatures = {
   3: {
+    "Support 'define' in modules when used as object field (needed for Angular)":
+      'https://github.com/liferay/liferay-npm-build-tools/issues/74'
+  },
+  2: {
     'Support for jQuery when Liferay AMD Loader is not exposed as a global':
       'https://github.com/liferay/liferay-npm-build-tools/issues/68',
     'Support for @angular/animations package':
       'https://github.com/liferay/liferay-npm-build-tools/issues/66',
     'Support for packages with inner package.json files':
       'https://issues.liferay.com/browse/LPS-76482',
-  },
-  2: {
     'NPM resolver API': 'https://issues.liferay.com/browse/LPS-75257',
     'Resolve own package from NPMResolver':
       'https://issues.liferay.com/browse/LPS-75555',
     'Source maps support': 'https://issues.liferay.com/browse/LPS-75339',
     'Variable aliases in require attribute of <aui:script> tag':
-      'https://issues.liferay.com/browse/LPS-75553',
+      'https://issues.liferay.com/browse/LPS-75553'
   },
   1: {
-    'Basic functionality': null,
-  },
+    'Basic functionality': null
+  }
 };
+/* eslint-enable */
 
 /** Feature level breakpoints for the different components */
 export const gradleBreakpoints = [
@@ -61,10 +65,16 @@ export const loaderBreakpoints = [
 export const bundlerPluginBreakpoints = {
   'liferay-npm-bundler-plugin-inject-angular-dependencies': [
     {version: [1, 3, 0], level: maxFeatureLevel},
-    {version: [1, 0, 0], level: 2},
+    {version: [1, 0, 0], level: 1},
   ],
   'babel-plugin-namespace-amd-define': [
-    {version: [1, 4, 0], level: maxFeatureLevel},
-    {version: [1, 0, 0], level: 2},
+    {version: [1, 4, 2], level: maxFeatureLevel},
+    {version: [1, 4, 0], level: 2},
+    {version: [1, 0, 0], level: 1},
+  ],
+  'babel-preset-liferay-standard': [
+    {version: [1, 4, 2], level: maxFeatureLevel},
+    {version: [1, 4, 0], level: 2},
+    {version: [1, 0, 0], level: 1},
   ],
 };
